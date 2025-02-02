@@ -1,0 +1,7 @@
+companion/__pycache__
+data/
+models/
+scratchpad.py
+main.log
+.DS_STORE
+companion/.DS_STORE
