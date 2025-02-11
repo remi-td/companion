@@ -47,8 +47,6 @@ class ChatLLM:
         Returns:
             str: The generated response from the LLM model.
         """
-        # Add the user prompt to the conversation history
-        self._update_conversation_history(prompt, role="user")
 
         # Prepare the full context including previous conversation history
         conversation = self._prepare_prompt_with_context(context)
@@ -83,8 +81,6 @@ class ChatLLM:
             # Extract and store the response text
             response_text = full_response['choices'][0]['message']['content']
 
-        # Update the conversation history with the assistant's response
-        #self._update_conversation_history(full_response, role="assistant")
         print("CONVERSATION HISTORY:",self.conversation_history)
     
     def _prepare_prompt_with_context(self, context):
