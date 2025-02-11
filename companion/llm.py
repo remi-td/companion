@@ -8,22 +8,29 @@ Includes tunable parameters like temperature, max tokens, and more.
 from llama_cpp import Llama
 from config import config 
 
-class LLM:
+class ChatLLM:
     def __init__(self):
         """
         Initialize the LLM model using configuration settings from the config.yaml file.
         """
-        model_config = config.get("model")
-        self.model = Llama(
-            model_path=model_config["path"],
-            n_gpu_layers=int(model_config.get("n_gpu_layers", 0))
-        )
+        model_config = config.get("llm-chat")
 
-        # Store parameters from the config file
+        # Gather parameters from the config file
+        self.model_path=model_config["path"]
+        self.n_gpu_layers=int(model_config.get("n_gpu_layers", 0))
         self.temperature = float(model_config.get("temperature", 0.7))
         self.max_tokens = int(model_config.get("max_tokens", 256))
         self.top_p = float(model_config.get("top_p", 0.9))
-        self.n_ctx = int(model_config.get("n_ctx", 2048))
+        self.thinking_tag = list(model_config.get("thinking_tag", None))
+
+        # Load the model
+        self.model = Llama(
+            model_path=self.model_path,
+            n_ctx=int(model_config.get("n_ctx", 2048)),
+            n_gpu_layers=self.n_gpu_layers
+        )
+        
+        self.n_ctx=self.model.n_ctx()
 
         # Initialize chat context storage
         self.conversation_history = []
@@ -70,14 +77,14 @@ class LLM:
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
                 top_p=self.top_p,
-                stream=stream
+                stream=False
             )
 
             # Extract and store the response text
             response_text = full_response['choices'][0]['message']['content']
 
         # Update the conversation history with the assistant's response
-        self._update_conversation_history(full_response, role="assistant")
+        #self._update_conversation_history(full_response, role="assistant")
         print("CONVERSATION HISTORY:",self.conversation_history)
     
     def _prepare_prompt_with_context(self, context):
@@ -136,3 +143,15 @@ class LLM:
         """
         # Load a new model from the given path using llama-cpp-python
         self.model = Llama(model_path=new_model_path)
+
+class EmbeddingLLM:
+    def __init__(self):
+        embed_config = config["llm-embed"]
+        self.model = Llama(
+            model_path=embed_config["model_path"],
+            n_gpu_layers=int(embed_config.get("n_gpu_layers", 0))
+        )
+        self.dim = int(embed_config.get("dim", 384))
+
+    def generate_embedding(self, text):
+        return self.model.create_embedding(text)["embedding"]        

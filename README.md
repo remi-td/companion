@@ -9,10 +9,10 @@ This project is designed to be a **minimal yet powerful implementation**, ensuri
 ## Features
 
 - **Runs Locally**: No external API calls; fully self-contained.
-- **Supports Llama-based Models**: Uses `llama-cpp-python` for inference.
-- **Persistent Chat Memory**: Maintains context using a rolling window approach.
-- **Efficient Token Management**: Automatically trims history to fit within the model's context window.
-- **Interactive UI**: Built using Streamlit for an easy-to-use interface.
+- **Supports Llama-based Models**: Uses `llama cpp` for inference.
+- **Persistent Chat Memory**: Persists chats in a database backend built in `sqlite`.
+- **Efficient Token Management**: Automatically trims history to fit within the model's context window. Removes thinking traces from chat history.
+- **Interactive UI**: Simple and easy-to-use interface built in `Streamlit`.
 
 ## Installation
 
@@ -73,13 +73,13 @@ This will launch the web interface in your browser.
 
 ## Configuration
 
-The model properties are maintained in the file config.yaml, and can be adjusted:
+The model properties are maintained in the file config.yaml under `llm-chat`, and can be adjusted:
 - `path`: Path to the LLM's .gguf file
 - `temperature`: Controls randomness (0 = deterministic, 1 = high variance)
 - `max_tokens`: Maximum output length per response
 - `top_p`: Nucleus sampling for diversity
 - `n_ctx`: Context window size (trims history automatically)
-
+- `thinking_tag` *(optional, default: `None`)*: Defines the start and end tags for capturing the model's internal reasoning (e.g., `["<think>", "</think>"]`). If set to `None`, thinking traces will not be extracted. extracted thinking traces are displayed but not carried in the model's chat history, and preserved separate from messages in the database bakend.
 
 ### Directory Structure
 ```
